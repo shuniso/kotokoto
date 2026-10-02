@@ -1,0 +1,52 @@
+# コトコトの設定。
+# 行頭に # がある行は無効。kotokoto.exe と同じフォルダーに置き、変更したらアプリを起動し直す。
+
+# 音量（%、0〜200）
+volume = 60
+
+# 音色。使いたい 1 行だけ # を外す（複数あれば最後の行が有効）。
+# それぞれの音は samples フォルダーの同じ名前の WAV で聴ける。
+#
+#   f0        いちばん低い共鳴の高さ (Hz)。全体の高さが決まる
+#   modes     共鳴の数
+#   spread    いちばん高い共鳴が f0 の何倍か
+#   loss      減衰しやすさ。大きいほど余韻が短い
+#   contact   接触時間（ミリ秒）。短いほど硬く明るい
+#   click_ms  接触音（カチッ）の長さ（ミリ秒）
+#   click     接触音の量
+#   click_hz  接触音の高さ (Hz)
+#   touch     指がキーに触れる音の量。0 で無し。入れると本体が約 8 ミリ秒遅れる
+#   release   キーを離したときの音の量。0 で無し
+
+# 20_短く詰まった : 余韻がほとんど無い「コッ」
+#tone = f0=240 modes=10 spread=14 loss=0.14 contact=0.22 click_ms=1.0 click=0.35 click_hz=3000 touch=0 release=0
+
+# 21_ノイズ主体 : 共鳴はすぐ消え、ノイズが主役の「トッ」
+#tone = f0=300 modes=8 spread=10 loss=0.30 contact=0.18 click_ms=3.5 click=0.9 click_hz=2500 touch=0 release=0
+
+# 22_カチカチ : 硬く明るい接触音
+#tone = f0=200 modes=10 spread=16 loss=0.12 contact=0.12 click_ms=2.0 click=0.9 click_hz=4200 touch=0 release=0
+
+# 23_中間 : 20 の短さと 22 の接触音の中間
+#tone = f0=220 modes=10 spread=15 loss=0.13 contact=0.16 click_ms=1.5 click=0.6 click_hz=3600 touch=0 release=0
+
+# 24_中間_離す音あり : 23 にキーを離す音を足したもの。「コ・ト」と鳴る
+tone = f0=220 modes=10 spread=15 loss=0.13 contact=0.16 click_ms=1.5 click=0.6 click_hz=3600 touch=0 release=0.45
+
+# 25_中間_触れる音と離す音あり : 23 に、指が触れる音とキーを離す音の両方を足したもの
+#tone = f0=220 modes=10 spread=15 loss=0.13 contact=0.16 click_ms=1.5 click=0.6 click_hz=3600 touch=0.2 release=0.45
+
+# 26_短く詰まった_離す音あり : 20 にキーを離す音を足したもの
+#tone = f0=240 modes=10 spread=14 loss=0.14 contact=0.22 click_ms=1.0 click=0.35 click_hz=3000 touch=0 release=0.45
+
+# 27_ノイズ主体_離す音あり : 21 にキーを離す音を足したもの
+#tone = f0=300 modes=8 spread=10 loss=0.30 contact=0.18 click_ms=3.5 click=0.9 click_hz=2500 touch=0 release=0.5
+
+# 28_中間_低め_離す音あり : 24 を低くしたもの
+#tone = f0=170 modes=10 spread=15 loss=0.13 contact=0.16 click_ms=1.5 click=0.6 click_hz=3600 touch=0 release=0.45
+
+# 29_中間_高め_離す音あり : 24 を高くしたもの
+#tone = f0=310 modes=10 spread=15 loss=0.13 contact=0.16 click_ms=1.5 click=0.6 click_hz=3600 touch=0 release=0.45
+
+# 30_中間_強く減衰_離す音あり : 24 の余韻をさらに削ったもの（フォームを詰めた感じ）
+#tone = f0=220 modes=10 spread=15 loss=0.22 contact=0.16 click_ms=1.5 click=0.6 click_hz=3600 touch=0 release=0.45

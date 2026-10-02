@@ -17,6 +17,7 @@ use windows_sys::Win32::UI::Shell::{
 };
 use windows_sys::Win32::UI::WindowsAndMessaging::*;
 
+use crate::audio::Hit;
 use crate::sound;
 
 /// 表示名（トレイのツールチップなど）
@@ -26,13 +27,13 @@ const CMD_QUIT: usize = 1;
 /// 同じキーの keydown がこの間隔以内で続いたらオートリピートとみなす（リピート開始の遅延は最大 1 秒）
 const REPEAT_MS: u32 = 1500;
 
-static TX: OnceLock<Sender<usize>> = OnceLock::new();
+static TX: OnceLock<Sender<Hit>> = OnceLock::new();
 /// キーごとの「押下中なら最後の keydown 時刻（0 以外）、離していれば 0」
 static HELD: [AtomicU32; 256] = [const { AtomicU32::new(0) }; 256];
 /// エクスプローラー再起動の通知。トレイアイコンを登録し直すのに使う
 static TASKBAR_CREATED: AtomicU32 = AtomicU32::new(0);
 
-pub fn run(tx: Sender<usize>) {
+pub fn run(tx: Sender<Hit>) {
     unsafe {
         // 二重起動すると音が重なるので、後から起動した方は黙って終わる
         CreateMutexW(ptr::null(), 0, w!("kotokoto-single-instance"));
@@ -119,16 +120,25 @@ unsafe extern "system" fn key_proc(code: i32, wp: WPARAM, lp: LPARAM) -> LRESULT
                 // 時刻も見るのは、Win+L や UAC で keyup を取り逃がしたキーが鳴らなくなるのを防ぐため。
                 let prev = held.swap(key.time | 1, Relaxed);
                 if prev == 0 || key.time.wrapping_sub(prev) >= REPEAT_MS {
-                    if let (Some(tx), Some(variant)) = (TX.get(), sound::variant(key.vkCode)) {
-                        let _ = tx.send(variant);
-                    }
+                    send(key.vkCode, false);
                 }
             }
-            WM_KEYUP | WM_SYSKEYUP => held.store(0, Relaxed),
+            WM_KEYUP | WM_SYSKEYUP => {
+                // 押したところを見ていないキーの離す音は鳴らさない
+                if held.swap(0, Relaxed) != 0 {
+                    send(key.vkCode, true);
+                }
+            }
             _ => {}
         }
     }
     CallNextHookEx(ptr::null_mut(), code, wp, lp)
+}
+
+fn send(vk: u32, release: bool) {
+    if let (Some(tx), Some(pitch)) = (TX.get(), sound::pitch(vk)) {
+        let _ = tx.send(Hit { pitch, release });
+    }
 }
 
 unsafe extern "system" fn wnd_proc(hwnd: HWND, msg: u32, wp: WPARAM, lp: LPARAM) -> LRESULT {
