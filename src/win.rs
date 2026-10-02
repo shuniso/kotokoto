@@ -12,7 +12,6 @@ use windows_sys::Win32::Foundation::{
 };
 use windows_sys::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows_sys::Win32::System::Threading::CreateMutexW;
-use windows_sys::Win32::UI::Input::KeyboardAndMouse::{VK_BACK, VK_RETURN, VK_SPACE};
 use windows_sys::Win32::UI::Shell::{
     Shell_NotifyIconW, NIF_ICON, NIF_MESSAGE, NIF_TIP, NIM_ADD, NIM_DELETE, NOTIFYICONDATAW,
 };
@@ -120,9 +119,8 @@ unsafe extern "system" fn key_proc(code: i32, wp: WPARAM, lp: LPARAM) -> LRESULT
                 // 時刻も見るのは、Win+L や UAC で keyup を取り逃がしたキーが鳴らなくなるのを防ぐため。
                 let prev = held.swap(key.time | 1, Relaxed);
                 if prev == 0 || key.time.wrapping_sub(prev) >= REPEAT_MS {
-                    let big = matches!(key.vkCode as u16, VK_SPACE | VK_RETURN | VK_BACK);
-                    if let Some(tx) = TX.get() {
-                        let _ = tx.send(sound::variant(key.vkCode, big));
+                    if let (Some(tx), Some(variant)) = (TX.get(), sound::variant(key.vkCode)) {
+                        let _ = tx.send(variant);
                     }
                 }
             }

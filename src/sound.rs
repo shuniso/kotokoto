@@ -29,12 +29,18 @@ const NORMAL: usize = 8;
 /// Space / Enter など大きいキーの音程倍率
 const BIG_PITCH: f32 = 0.78;
 
-/// キーから音の番号を決める。同じキーはいつも同じ音になる。
-pub fn variant(key: u32, big: bool) -> usize {
-    if big {
-        0
-    } else {
-        1 + key as usize * 5 % NORMAL
+/// 仮想キーコードから音の番号を決める。同じキーはいつも同じ音になる。
+/// 鳴らすのは文字キーと Space / Enter / Backspace だけで、それ以外（修飾キー、Tab、Esc、
+/// 矢印、ファンクションキーなど）は `None`。
+pub fn variant(vk: u32) -> Option<usize> {
+    match vk {
+        // Backspace, Enter, Space
+        0x08 | 0x0D | 0x20 => Some(0),
+        // 0-9, A-Z, テンキー, 記号キー（日本語配列の ¥ や ろ を含む）
+        0x30..=0x39 | 0x41..=0x5A | 0x60..=0x6F | 0xBA..=0xC0 | 0xDB..=0xDF | 0xE2 => {
+            Some(1 + vk as usize * 5 % NORMAL)
+        }
+        _ => None,
     }
 }
 
@@ -88,9 +94,27 @@ mod tests {
     #[test]
     fn bank_covers_every_variant() {
         let bank = bank(48_000);
-        for key in 0..256 {
-            assert!(variant(key, false) < bank.len());
-            assert_ne!(variant(key, false), variant(key, true));
+        for vk in 0..256 {
+            assert!(variant(vk).is_none_or(|v| v < bank.len()));
+        }
+    }
+
+    #[test]
+    fn only_typing_keys_sound() {
+        // Backspace, Enter, Space は大きいキーの音
+        for vk in [0x08, 0x0D, 0x20] {
+            assert_eq!(variant(vk), Some(0));
+        }
+        // A, Z, 0, 9, テンキー 5, ; , / , ¥ , ろ
+        for vk in [0x41, 0x5A, 0x30, 0x39, 0x65, 0xBA, 0xBF, 0xDC, 0xE2] {
+            assert!(variant(vk).is_some_and(|v| v > 0), "{vk:#x}");
+        }
+        // Tab, Shift, Ctrl, Alt, CapsLock, Esc, 変換, 矢印, Delete, Win, F1, 左Shift, 左Ctrl, 半角/全角
+        for vk in [
+            0x09, 0x10, 0x11, 0x12, 0x14, 0x1B, 0x1C, 0x25, 0x26, 0x2E, 0x5B, 0x70, 0xA0, 0xA2,
+            0xF3, 0xF4,
+        ] {
+            assert_eq!(variant(vk), None, "{vk:#x}");
         }
     }
 

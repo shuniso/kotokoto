@@ -29,8 +29,11 @@ fn main() {
 fn demo(tx: std::sync::mpsc::Sender<usize>) {
     use std::{thread::sleep, time::Duration};
 
-    for (i, c) in "kotokoto kotokoto  kotokoto kotokoto ".bytes().enumerate() {
-        let _ = tx.send(sound::variant(c as u32, c == b' '));
+    // 大文字と空白の文字コードは仮想キーコードと同じ
+    for (i, c) in "KOTOKOTO KOTOKOTO  KOTOKOTO KOTOKOTO ".bytes().enumerate() {
+        if let Some(variant) = sound::variant(c as u32) {
+            let _ = tx.send(variant);
+        }
         sleep(Duration::from_millis(70 + (i as u64 * 37) % 90));
     }
     sleep(Duration::from_millis(300));

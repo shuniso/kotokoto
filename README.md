@@ -4,6 +4,7 @@
 [rustyvibes](https://github.com/kunalbagaria/rustyvibes) を最小構成で作り直したもの。
 
 - 音は 1 種類。サウンドパックは読まず、音は起動時に計算で作る（`kotokoto.exe` 単体で動く）
+- 鳴るのは文字キーと Space / Enter / Backspace だけ。修飾キー、Tab、Esc、矢印などは鳴らない
 - 鳴るのは押したときだけ。押しっぱなしのリピートでは鳴らない
 - キーごとに少しだけ高さが違い、Space / Enter / Backspace は低い
 - ネットワークは使わず、打鍵内容も保存しない
