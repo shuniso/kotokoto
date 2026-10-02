@@ -63,7 +63,11 @@ fn run(rx: Receiver<usize>, volume: f32) {
                 if voices.len() == MAX_VOICES {
                     voices.remove(0);
                 }
-                voices.push(Voice { variant, pos: 0, gain });
+                voices.push(Voice {
+                    variant,
+                    pos: 0,
+                    gain,
+                });
             }
             Err(RecvTimeoutError::Timeout) => out = None,
             Err(RecvTimeoutError::Disconnected) => return,
@@ -85,7 +89,11 @@ fn open() -> Option<Output> {
         _ => return None,
     }?;
     stream.play().ok()?;
-    Some(Output { _stream: stream, voices, broken })
+    Some(Output {
+        _stream: stream,
+        voices,
+        broken,
+    })
 }
 
 fn build<T: SizedSample + FromSample<f32>>(

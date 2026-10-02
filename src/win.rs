@@ -5,6 +5,7 @@ use std::sync::mpsc::Sender;
 use std::sync::OnceLock;
 use std::{mem, ptr};
 
+use windows_sys::core::PCWSTR;
 use windows_sys::w;
 use windows_sys::Win32::Foundation::{
     GetLastError, ERROR_ALREADY_EXISTS, HWND, LPARAM, LRESULT, POINT, WPARAM,
@@ -19,6 +20,8 @@ use windows_sys::Win32::UI::WindowsAndMessaging::*;
 
 use crate::sound;
 
+/// 表示名（トレイのツールチップなど）
+const NAME: PCWSTR = w!("コトコト");
 const WM_TRAY: u32 = WM_APP + 1;
 const CMD_QUIT: usize = 1;
 /// 同じキーの keydown がこの間隔以内で続いたらオートリピートとみなす（リピート開始の遅延は最大 1 秒）
@@ -52,7 +55,7 @@ pub fn run(tx: Sender<usize>) {
         let hwnd = CreateWindowExW(
             0,
             class,
-            class,
+            NAME,
             0,
             0,
             0,
@@ -69,7 +72,7 @@ pub fn run(tx: Sender<usize>) {
             MessageBoxW(
                 ptr::null_mut(),
                 w!("起動に失敗しました。"),
-                class,
+                NAME,
                 MB_ICONERROR,
             );
             return;
@@ -98,8 +101,11 @@ unsafe fn tray_icon(hwnd: HWND) -> NOTIFYICONDATAW {
     nid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
     nid.uCallbackMessage = WM_TRAY;
     nid.hIcon = LoadIconW(ptr::null_mut(), IDI_APPLICATION);
-    for (dst, src) in nid.szTip.iter_mut().zip("kotokoto".encode_utf16()) {
-        *dst = src;
+    for (i, dst) in nid.szTip.iter_mut().enumerate() {
+        *dst = *NAME.add(i);
+        if *dst == 0 {
+            break;
+        }
     }
     nid
 }

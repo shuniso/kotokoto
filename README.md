@@ -1,4 +1,4 @@
-# kotokoto
+# コトコト (kotokoto)
 
 キーを打つとコトコト鳴るだけの Windows 11 常駐アプリ。
 [rustyvibes](https://github.com/kunalbagaria/rustyvibes) を最小構成で作り直したもの。
