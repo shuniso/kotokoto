@@ -100,7 +100,16 @@ unsafe fn tray_icon(hwnd: HWND) -> NOTIFYICONDATAW {
     nid.uID = 1;
     nid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
     nid.uCallbackMessage = WM_TRAY;
-    nid.hIcon = LoadIconW(ptr::null_mut(), IDI_APPLICATION);
+    // build.rs で exe に埋め込んだアイコン（winresource の既定 ID は 1）。
+    // 共有ハンドルなので DestroyIcon は不要。
+    nid.hIcon = LoadImageW(
+        GetModuleHandleW(ptr::null()),
+        1usize as PCWSTR,
+        IMAGE_ICON,
+        GetSystemMetrics(SM_CXSMICON),
+        GetSystemMetrics(SM_CYSMICON),
+        LR_SHARED,
+    ) as HICON;
     for (i, dst) in nid.szTip.iter_mut().enumerate() {
         *dst = *NAME.add(i);
         if *dst == 0 {

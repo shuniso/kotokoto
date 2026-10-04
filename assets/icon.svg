@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>コトコト — グレーの立体キーキャップ</title>
+  <rect x="48" y="80" width="416" height="384" rx="104" fill="#777777"/>
+  <rect x="48" y="48" width="416" height="368" rx="104" fill="#BBBBBB"/>
+  <path d="M48 312 L89 279 L162 365 L350 365 L423 279 L464 312 L464 344 C464 384 432 416 392 416 L120 416 C80 416 48 384 48 344 Z" fill="#A0A0A0"/>
+  <rect x="89" y="79" width="334" height="282" rx="73" fill="#FFFFFF"/>
+  <rect x="89" y="83" width="334" height="282" rx="73" fill="#E8E8E8"/>
+</svg>

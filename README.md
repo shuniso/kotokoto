@@ -3,6 +3,8 @@
 キーを打つとコトコト鳴るだけの Windows 11 常駐アプリ。
 [rustyvibes](https://github.com/kunalbagaria/rustyvibes) を最小構成で作り直したもの。
 
+<img src="assets/icon.png" alt="コトコトのグレーの立体キーキャップ" width="96">
+
 - サウンドパックは読まず、音は計算で作る（`kotokoto.exe` 単体で動く）
 - 音色は設定ファイルの一覧から選べる
 - 鳴るのは文字キーと Space / Enter / Backspace だけ。修飾キー、Tab、Esc、矢印などは鳴らない
@@ -58,6 +60,18 @@ cargo run -- samples   # 一覧の全音色を samples/*.wav に書き出す
 | `src/win.rs` | グローバルキーフックとトレイアイコン |
 | `src/dev.rs` | 開発用の打鍵デモとサンプル書き出し（Windows 版には入らない） |
 | `samples/` | 各音色のサンプル音源 |
+| `assets/icon.svg` | アイコンの編集用原本（グレーの立体キーキャップ） |
+| `assets/icon.png` | 1024 × 1024 の透過 PNG |
+| `assets/icon.ico` | Windows 用アイコン（16 / 24 / 32 / 48 / 64 / 128 / 256 px） |
+| `build.rs` | Windows ビルド時にアイコンを exe に埋め込む |
+
+アイコンは exe とタスクトレイで共通。配布時にアイコンファイルを添付する必要はない。
+SVG を編集した場合は [ImageMagick](https://imagemagick.org/) で再生成できる。
+
+```sh
+magick -background none assets/icon.svg -resize 1024x1024 assets/icon.png
+magick assets/icon.png -define icon:auto-resize=256,128,64,48,32,24,16 assets/icon.ico
+```
 
 ## ライセンス
 
